@@ -15,6 +15,9 @@ class AccountBlockedError extends CredentialsSignin {
 class TeacherPendingApprovalError extends CredentialsSignin {
   code = "TEACHER_PENDING_APPROVAL";
 }
+class RoleMismatchError extends CredentialsSignin {
+  code = "ROLE_MISMATCH";
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -24,11 +27,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email" },
         password: { label: "Password", type: "password" },
+        role: { label: "Role" },
       },
       async authorize(rawCredentials) {
         const parsed = loginSchema.safeParse(rawCredentials);
         if (!parsed.success) return null;
-        const { email, password } = parsed.data;
+        const { email, password, role } = parsed.data;
 
         await connectDB();
         const user = await User.findOne({ email: email.trim().toLowerCase() });
@@ -36,6 +40,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);
         if (!isValidPassword) return null;
+
+        if (role && role !== user.role) {
+          throw new RoleMismatchError();
+        }
 
         if (!user.isEmailVerified) {
           throw new EmailNotVerifiedError();

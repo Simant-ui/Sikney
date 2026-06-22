@@ -58,6 +58,7 @@ function LoginForm() {
     const result = await signIn("credentials", {
       email: data.email,
       password: data.password,
+      role: loginAs,
       redirect: false,
     });
 
@@ -75,6 +76,10 @@ function LoginForm() {
       }
       if (result.code === "TEACHER_PENDING_APPROVAL") {
         toast.error("Your teacher account is pending admin approval.");
+        return;
+      }
+      if (result.code === "ROLE_MISMATCH") {
+        toast.error(`This account isn't registered as a ${loginAs}. Select the correct option above.`);
         return;
       }
       toast.error("Invalid email or password.");
