@@ -4,6 +4,8 @@ import { requireRole } from "@/lib/api-auth";
 import { Course } from "@/models/Course";
 import { Assignment } from "@/models/Assignment";
 import { Submission } from "@/models/Submission";
+import { Enrollment } from "@/models/Enrollment";
+import { Notification } from "@/models/Notification";
 import { createAssignmentSchema } from "@/lib/validations";
 
 export async function GET() {
@@ -58,6 +60,19 @@ export async function POST(request: Request) {
     dueDate: new Date(parsed.data.dueDate),
     teacherId: session!.user.id,
   });
+
+  if (assignment.isPublished) {
+    const enrollments = await Enrollment.find({ courseId: course._id, status: "active" }).lean();
+    await Notification.insertMany(
+      enrollments.map((e) => ({
+        userId: e.studentId,
+        title: "New assignment posted",
+        body: `"${assignment.title}" was assigned in ${course.title}`,
+        link: "/student/assignments",
+        type: "assignment",
+      }))
+    );
+  }
 
   return NextResponse.json(assignment, { status: 201 });
 }

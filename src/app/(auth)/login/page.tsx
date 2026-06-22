@@ -29,6 +29,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginAs, setLoginAs] = useState<"student" | "teacher">("student");
 
   const {
     register,
@@ -94,6 +95,23 @@ function LoginForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              {(["student", "teacher"] as const).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setLoginAs(r)}
+                  className={`rounded-lg border px-3 py-2 text-sm font-medium capitalize transition-colors ${
+                    loginAs === r
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:bg-muted"
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" autoComplete="email" {...register("email")} />

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 interface FileUploadFieldProps {
   value?: string;
-  onChange: (url: string) => void;
+  onChange: (url: string, file?: File) => void;
   folder?: string;
   accept?: string;
   label?: string;
@@ -33,7 +33,7 @@ export function FileUploadField({ value, onChange, folder, accept, label }: File
         toast.error(json.error ?? "Upload failed");
         return;
       }
-      onChange(json.url);
+      onChange(json.url, file);
       toast.success("File uploaded");
     } finally {
       setIsUploading(false);

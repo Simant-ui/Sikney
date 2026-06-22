@@ -145,3 +145,11 @@ export const createNoteSchema = z.object({
 });
 
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
+
+export const createVideoSchema = z.object({
+  courseId: z.string().min(1, "Select a course"),
+  title: z.string().min(2, "Title is required").max(150),
+  url: z.string().min(1, "Upload a video"),
+});
+
+export type CreateVideoInput = z.infer<typeof createVideoSchema>;

@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { requireRole } from "@/lib/api-auth";
 import { Submission } from "@/models/Submission";
 import { Assignment } from "@/models/Assignment";
+import { Notification } from "@/models/Notification";
 import { gradeSubmissionSchema } from "@/lib/validations";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -33,6 +34,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   submission.status = "graded";
   submission.gradedAt = new Date();
   await submission.save();
+
+  await Notification.create({
+    userId: submission.studentId,
+    title: "Assignment graded",
+    body: `"${assignment.title}" was graded: ${parsed.data.marksObtained}/${assignment.maxMarks}`,
+    link: "/student/assignments",
+    type: "assignment",
+  });
 
   return NextResponse.json(submission);
 }
