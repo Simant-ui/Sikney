@@ -14,6 +14,12 @@ import {
 } from "lucide-react";
 import { LandingHero } from "@/components/shared/landing-hero";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const features = [
   {
@@ -66,6 +72,39 @@ const roles = [
   },
 ];
 
+const faqs = [
+  {
+    question: "What is Sikney?",
+    answer:
+      "Sikney is an online tuition class and knowledge website for Nepal. It connects students with teachers for live classes, recorded lessons, notes, assignments, quizzes, and attendance tracking — all in one platform.",
+  },
+  {
+    question: "How do I find the best teacher near me on Sikney?",
+    answer:
+      "After signing up as a student, open the Teachers tab in your dashboard to browse every teacher on Sikney, filter by subject, and message them directly to ask questions or get started.",
+  },
+  {
+    question: "Is Sikney free to use?",
+    answer:
+      "Creating an account and browsing teachers and courses is free. Individual course pricing is set by each teacher.",
+  },
+  {
+    question: "Can I attend live classes and watch recordings later?",
+    answer:
+      "Yes. Teachers can schedule live Zoom or Google Meet classes, and also upload recorded lessons that stay available in your dashboard so you can review them anytime.",
+  },
+  {
+    question: "How do I start teaching on Sikney?",
+    answer:
+      "Click \"Teach with us\" or sign up with the Teacher role, add the subjects you teach, and create your first course. New teacher accounts are reviewed by an admin before they go live.",
+  },
+  {
+    question: "Is my data safe on Sikney?",
+    answer:
+      "Yes. Sikney uses role-based access control and verified accounts, so students, teachers, and admins only see the data relevant to their role.",
+  },
+];
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -90,6 +129,17 @@ const jsonLd = {
         target: `${SITE_URL}/?q={search_term_string}`,
         "query-input": "required name=search_term_string",
       },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
     },
   ],
 };
@@ -177,6 +227,24 @@ export default function Home() {
           quizzes, and attendance tracking — all from one account at{" "}
           <span className="font-medium text-foreground">sikney.com</span>.
         </p>
+      </section>
+
+      <section className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <h2 className="text-3xl font-bold sm:text-4xl">Frequently asked questions</h2>
+        </div>
+        <Accordion type="single" collapsible className="w-full">
+          {faqs.map((faq, i) => (
+            <AccordionItem key={faq.question} value={`faq-${i}`}>
+              <AccordionTrigger className="text-left text-base font-medium">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground">
+                {faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </section>
 
       <footer className="border-t border-border/50 px-4 py-8 text-center text-sm text-muted-foreground">
