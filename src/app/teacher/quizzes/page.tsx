@@ -80,7 +80,7 @@ export default function TeacherQuizzesPage() {
         {data?.map((quiz) => (
           <Card key={quiz._id} className="glass border-0">
             <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
-              <div>
+              <Link href={`/teacher/quizzes/${quiz._id}`} className="flex-1">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold">{quiz.title}</h3>
                   <Badge variant={quiz.isPublished ? "default" : "secondary"}>
@@ -90,12 +90,12 @@ export default function TeacherQuizzesPage() {
                 <p className="text-sm text-muted-foreground">
                   {quiz.courseTitle} &middot; {quiz.questionCount} questions &middot; {quiz.durationMinutes} min
                 </p>
-              </div>
+              </Link>
               <div className="flex items-center gap-4">
-                <div className="text-right text-sm">
+                <Link href={`/teacher/quizzes/${quiz._id}`} className="text-right text-sm hover:underline">
                   <p className="font-medium">{quiz.attemptCount} attempts</p>
                   {quiz.attemptCount > 0 && <p className="text-muted-foreground">Avg {quiz.avgPercentage}%</p>}
-                </div>
+                </Link>
                 <label className="flex items-center gap-2 text-xs text-muted-foreground">
                   Publish
                   <Switch
