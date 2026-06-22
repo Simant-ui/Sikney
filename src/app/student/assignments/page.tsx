@@ -119,7 +119,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentItem }) {
           </div>
         )}
 
-        {assignment.submission && assignment.submission.status === "pending" && (
+        {assignment.submission && (
           <a
             href={assignment.submission.fileUrl}
             target="_blank"

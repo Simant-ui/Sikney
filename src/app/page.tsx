@@ -13,6 +13,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { LandingHero } from "@/components/shared/landing-hero";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 const features = [
   {
@@ -65,9 +66,41 @@ const roles = [
   },
 ];
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      name: SITE_NAME,
+      alternateName: ["sikney.com", "sikney.com.np"],
+      url: SITE_URL,
+      description:
+        "Sikney is an online tuition class and knowledge website in Nepal, connecting students with the best teachers near them for live classes, recorded lessons, notes, assignments, and quizzes.",
+      areaServed: {
+        "@type": "Country",
+        name: "Nepal",
+      },
+    },
+    {
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: SITE_URL,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${SITE_URL}/?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <header className="sticky top-0 z-40 border-b border-border/50 glass">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
@@ -132,6 +165,18 @@ export default function Home() {
             </Card>
           ))}
         </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-3xl px-4 py-12 text-center sm:px-6">
+        <h2 className="text-2xl font-bold sm:text-3xl">
+          Looking for the best tuition class in Nepal?
+        </h2>
+        <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+          Sikney is a knowledge website and online tuition class built for Nepal, helping students
+          find the best teacher near me for live classes, recorded lessons, notes, assignments,
+          quizzes, and attendance tracking — all from one account at{" "}
+          <span className="font-medium text-foreground">sikney.com</span>.
+        </p>
       </section>
 
       <footer className="border-t border-border/50 px-4 py-8 text-center text-sm text-muted-foreground">
