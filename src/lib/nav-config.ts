@@ -30,6 +30,7 @@ export interface NavItem {
 export const studentNav: NavItem[] = [
   { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard, mobile: true },
   { label: "My Courses", href: "/student/courses", icon: BookOpen, mobile: true },
+  { label: "Teachers", href: "/student/teachers", icon: Users },
   { label: "Live Classes", href: "/student/live-classes", icon: Video },
   { label: "Recorded Classes", href: "/student/recorded-classes", icon: Video },
   { label: "Notes & PDFs", href: "/student/notes", icon: FileText },

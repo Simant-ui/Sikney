@@ -52,3 +52,31 @@ export async function sendOtpEmail(params: {
     ),
   });
 }
+
+function simpleEmailHtml(heading: string, message: string) {
+  return `
+  <div style="font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; background: #f5f3ff;">
+    <h1 style="font-size: 22px; color: #4338ca; margin-bottom: 8px;">Sikney</h1>
+    <h2 style="font-size: 18px; color: #1f2937; margin-top: 24px;">${heading}</h2>
+    <p style="color: #4b5563; font-size: 14px; line-height: 1.6;">${message}</p>
+  </div>`;
+}
+
+export async function sendNewRecordingEmail(params: {
+  to: string;
+  teacherName: string;
+  courseTitle: string;
+  videoTitle: string;
+}) {
+  const { to, teacherName, courseTitle, videoTitle } = params;
+
+  await getTransporter().sendMail({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject: `New recorded class: ${videoTitle}`,
+    html: simpleEmailHtml(
+      "New recorded class available",
+      `${teacherName} just shared a new recording, "${videoTitle}", in your course "${courseTitle}". Log in to Sikney to watch it.`
+    ),
+  });
+}

@@ -9,6 +9,7 @@ export interface IMessage extends Document {
   content?: string;
   attachmentUrl?: string;
   type: MessageType;
+  courseId?: Types.ObjectId;
   readAt?: Date;
   createdAt: Date;
 }
@@ -21,6 +22,7 @@ const MessageSchema = new Schema<IMessage>(
     content: { type: String },
     attachmentUrl: { type: String },
     type: { type: String, enum: ["text", "image", "file"], default: "text" },
+    courseId: { type: Schema.Types.ObjectId, ref: "Course" },
     readAt: { type: Date },
   },
   { timestamps: { createdAt: true, updatedAt: false } }

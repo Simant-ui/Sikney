@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format, isPast } from "date-fns";
-import { ClipboardCheck } from "lucide-react";
+import { ClipboardCheck, Loader2, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileUploadField } from "@/components/shared/file-upload-field";
 
 interface AssignmentItem {
   _id: string;
@@ -31,21 +30,31 @@ async function fetchAssignments(): Promise<AssignmentItem[]> {
 
 function AssignmentCard({ assignment }: { assignment: AssignmentItem }) {
   const queryClient = useQueryClient();
-  const [fileUrl, setFileUrl] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const overdue = isPast(new Date(assignment.dueDate)) && !assignment.submission;
 
-  async function handleSubmit() {
-    if (!fileUrl) {
-      toast.error("Upload a file first");
-      return;
-    }
+  async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
     setIsSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "submissions");
+
+      const uploadRes = await fetch("/api/uploads", { method: "POST", body: formData });
+      const uploadJson = await uploadRes.json();
+      if (!uploadRes.ok) {
+        toast.error(uploadJson.error ?? "Upload failed");
+        return;
+      }
+
       const res = await fetch(`/api/student/assignments/${assignment._id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileUrl }),
+        body: JSON.stringify({ fileUrl: uploadJson.url }),
       });
       if (!res.ok) {
         const json = await res.json();
@@ -57,6 +66,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentItem }) {
       queryClient.invalidateQueries({ queryKey: ["student-dashboard"] });
     } finally {
       setIsSubmitting(false);
+      if (inputRef.current) inputRef.current.value = "";
     }
   }
 
@@ -95,14 +105,15 @@ function AssignmentCard({ assignment }: { assignment: AssignmentItem }) {
         )}
 
         {!assignment.submission && (
-          <div className="space-y-2 border-t border-border/60 pt-3">
-            <FileUploadField value={fileUrl} onChange={setFileUrl} folder="submissions" label="Upload your work" />
+          <div className="border-t border-border/60 pt-3">
+            <input ref={inputRef} type="file" className="hidden" onChange={handleFileSelected} />
             <Button
               size="sm"
-              onClick={handleSubmit}
-              disabled={isSubmitting || !fileUrl}
+              onClick={() => inputRef.current?.click()}
+              disabled={isSubmitting}
               className="brand-gradient-bg border-0 text-white"
             >
+              {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
               Submit assignment
             </Button>
           </div>

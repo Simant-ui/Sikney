@@ -25,7 +25,11 @@ async function fetchNotifications(): Promise<NotificationItem[]> {
 
 export function NotificationList() {
   const queryClient = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["notifications"], queryFn: fetchNotifications });
+  const { data, isLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: fetchNotifications,
+    refetchInterval: 15000,
+  });
 
   async function markRead(id: string) {
     await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });

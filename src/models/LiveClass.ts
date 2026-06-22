@@ -13,6 +13,7 @@ export interface ILiveClass extends Document {
   scheduledAt: Date;
   durationMinutes: number;
   status: LiveClassStatus;
+  studentIds: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,6 +29,7 @@ const LiveClassSchema = new Schema<ILiveClass>(
     scheduledAt: { type: Date, required: true },
     durationMinutes: { type: Number, required: true },
     status: { type: String, enum: ["scheduled", "live", "ended", "cancelled"], default: "scheduled" },
+    studentIds: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

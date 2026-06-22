@@ -11,6 +11,7 @@ interface VideoItem {
   _id: string;
   title: string;
   courseTitle: string;
+  teacherName: string;
   url: string;
   createdAt: string;
 }
@@ -61,7 +62,7 @@ export default function StudentRecordedClassesPage() {
           <CardContent className="p-4">
             <h3 className="font-semibold">{v.title}</h3>
             <p className="text-sm text-muted-foreground">
-              {v.courseTitle} &middot; Added {format(new Date(v.createdAt), "MMM d, yyyy")}
+              {v.courseTitle} &middot; by {v.teacherName} &middot; Added {format(new Date(v.createdAt), "MMM d, yyyy")}
             </p>
           </CardContent>
         </Card>

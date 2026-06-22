@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { StudentPicker } from "@/components/shared/student-picker";
 import { createLiveClassSchema, type CreateLiveClassInput } from "@/lib/validations";
 import { Loader2 } from "lucide-react";
 
@@ -52,11 +53,13 @@ export default function NewLiveClassPage() {
       joinUrl: "",
       scheduledAt: "",
       durationMinutes: 60,
+      studentIds: [],
     },
   });
 
   const courseId = watch("courseId");
   const platform = watch("platform");
+  const studentIds = watch("studentIds") ?? [];
 
   const onSubmit = async (data: CreateLiveClassInput) => {
     setIsSubmitting(true);
@@ -101,6 +104,17 @@ export default function NewLiveClassPage() {
               </Select>
               {errors.courseId && <p className="text-sm text-destructive">{errors.courseId.message}</p>}
             </div>
+
+            {courseId && (
+              <div className="space-y-2">
+                <Label>Invite specific students (optional)</Label>
+                <StudentPicker
+                  courseId={courseId}
+                  value={studentIds}
+                  onChange={(ids) => setValue("studentIds", ids)}
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>

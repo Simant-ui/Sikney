@@ -3,6 +3,8 @@ import { connectDB } from "@/lib/db";
 import { requireRole } from "@/lib/api-auth";
 import { Course } from "@/models/Course";
 import { LiveClass } from "@/models/LiveClass";
+import { Enrollment } from "@/models/Enrollment";
+import { Notification } from "@/models/Notification";
 import { createLiveClassSchema } from "@/lib/validations";
 
 export async function GET() {
@@ -49,6 +51,21 @@ export async function POST(request: Request) {
     scheduledAt: new Date(parsed.data.scheduledAt),
     teacherId: session!.user.id,
   });
+
+  let recipientIds = parsed.data.studentIds ?? [];
+  if (recipientIds.length === 0) {
+    const enrollments = await Enrollment.find({ courseId: course._id, status: "active" }).lean();
+    recipientIds = enrollments.map((e) => String(e.studentId));
+  }
+  await Notification.insertMany(
+    recipientIds.map((studentId) => ({
+      userId: studentId,
+      title: "New live class scheduled",
+      body: `"${liveClass.title}" in ${course.title}`,
+      link: "/student/live-classes",
+      type: "class",
+    }))
+  );
 
   return NextResponse.json(liveClass, { status: 201 });
 }

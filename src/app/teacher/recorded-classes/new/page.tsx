@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileUploadField } from "@/components/shared/file-upload-field";
+import { StudentPicker } from "@/components/shared/student-picker";
 import { createVideoSchema, type CreateVideoInput } from "@/lib/validations";
 import { Loader2 } from "lucide-react";
 
@@ -46,11 +47,12 @@ export default function NewRecordedClassPage() {
     formState: { errors },
   } = useForm<CreateVideoInput>({
     resolver: zodResolver(createVideoSchema),
-    defaultValues: { courseId: "", title: "", url: "" },
+    defaultValues: { courseId: "", title: "", url: "", studentIds: [] },
   });
 
   const courseId = watch("courseId");
   const url = watch("url");
+  const studentIds = watch("studentIds") ?? [];
 
   const onSubmit = async (data: CreateVideoInput) => {
     setIsSubmitting(true);
@@ -95,6 +97,17 @@ export default function NewRecordedClassPage() {
               </Select>
               {errors.courseId && <p className="text-sm text-destructive">{errors.courseId.message}</p>}
             </div>
+
+            {courseId && (
+              <div className="space-y-2">
+                <Label>Share with specific students (optional)</Label>
+                <StudentPicker
+                  courseId={courseId}
+                  value={studentIds}
+                  onChange={(ids) => setValue("studentIds", ids)}
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>

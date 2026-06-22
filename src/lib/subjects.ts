@@ -1,0 +1,15 @@
+export const SUBJECTS = [
+  "Mathematics",
+  "Science",
+  "English",
+  "Nepali",
+  "Social Studies",
+  "Computer Science",
+  "Accountancy",
+  "Economics",
+  "Business Studies",
+  "Biology",
+  "Chemistry",
+  "Physics",
+  "Health, Population & Environment",
+] as const;

@@ -12,7 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/shared/password-input";
+import { FileUploadField } from "@/components/shared/file-upload-field";
 import { signupSchema, type SignupInput } from "@/lib/validations";
+import { SUBJECTS } from "@/lib/subjects";
 import { Loader2 } from "lucide-react";
 
 export default function SignupPage() {
@@ -44,10 +46,19 @@ function SignupForm() {
       password: "",
       confirmPassword: "",
       role: initialRole,
+      subjects: [],
+      avatarUrl: "",
     },
   });
 
   const role = watch("role");
+  const subjects = watch("subjects") ?? [];
+  const avatarUrl = watch("avatarUrl");
+
+  function toggleSubject(subject: string) {
+    const current = subjects;
+    setValue("subjects", current.includes(subject) ? current.filter((s) => s !== subject) : [...current, subject]);
+  }
 
   const onSubmit = async (data: SignupInput) => {
     setIsSubmitting(true);
@@ -102,6 +113,19 @@ function SignupForm() {
               </div>
             </div>
 
+            {role === "teacher" && (
+              <div className="space-y-2">
+                <Label>Profile picture (optional)</Label>
+                <FileUploadField
+                  value={avatarUrl}
+                  onChange={(url) => setValue("avatarUrl", url)}
+                  folder="avatars"
+                  accept="image/*"
+                  label="Upload photo"
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="fullName">Full name</Label>
               <Input id="fullName" autoComplete="name" {...register("fullName")} />
@@ -134,6 +158,28 @@ function SignupForm() {
                 )}
               </div>
             </div>
+
+            {role === "teacher" && (
+              <div className="space-y-2">
+                <Label>Subjects you teach</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {SUBJECTS.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => toggleSubject(s)}
+                      className={`rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
+                        subjects.includes(s)
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border hover:bg-muted"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <Button type="submit" className="w-full brand-gradient-bg border-0 text-white" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}

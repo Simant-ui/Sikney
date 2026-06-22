@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   }
 
-  const { fullName, email, phone, password, role } = parsed.data;
+  const { fullName, email, phone, password, role, subjects, avatarUrl } = parsed.data;
   const normalizedEmail = email.toLowerCase();
 
   await connectDB();
@@ -50,12 +50,13 @@ export async function POST(request: Request) {
     phone,
     passwordHash,
     role,
+    avatarUrl: avatarUrl || undefined,
   });
 
   if (role === "student") {
     await StudentProfile.create({ userId: user._id, enrolledCourses: [] });
   } else {
-    await TeacherProfile.create({ userId: user._id, subjects: [] });
+    await TeacherProfile.create({ userId: user._id, subjects: subjects ?? [] });
   }
 
   const code = generateOtpCode();

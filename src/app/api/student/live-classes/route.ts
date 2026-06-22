@@ -16,7 +16,10 @@ export async function GET() {
   const courses = await Course.find({ _id: { $in: courseIds } }).lean();
   const courseMap = new Map(courses.map((c) => [String(c._id), c.title]));
 
-  const liveClasses = await LiveClass.find({ courseId: { $in: courseIds } })
+  const liveClasses = await LiveClass.find({
+    courseId: { $in: courseIds },
+    $or: [{ studentIds: { $size: 0 } }, { studentIds: session!.user.id }],
+  })
     .sort({ scheduledAt: 1 })
     .lean();
 

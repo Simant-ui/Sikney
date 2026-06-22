@@ -1,10 +1,20 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { loginSchema } from "@/lib/validations";
 import { authConfig } from "@/auth.config";
+
+class EmailNotVerifiedError extends CredentialsSignin {
+  code = "EMAIL_NOT_VERIFIED";
+}
+class AccountBlockedError extends CredentialsSignin {
+  code = "ACCOUNT_BLOCKED";
+}
+class TeacherPendingApprovalError extends CredentialsSignin {
+  code = "TEACHER_PENDING_APPROVAL";
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -28,13 +38,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!isValidPassword) return null;
 
         if (!user.isEmailVerified) {
-          throw new Error("EMAIL_NOT_VERIFIED");
+          throw new EmailNotVerifiedError();
         }
         if (user.status === "blocked") {
-          throw new Error("ACCOUNT_BLOCKED");
+          throw new AccountBlockedError();
         }
         if (user.role === "teacher" && user.status === "pending") {
-          throw new Error("TEACHER_PENDING_APPROVAL");
+          throw new TeacherPendingApprovalError();
         }
 
         return {

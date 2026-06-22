@@ -29,7 +29,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginAs, setLoginAs] = useState<"student" | "teacher">("student");
+  const [loginAs, setLoginAs] = useState<"student" | "teacher" | "admin">("student");
 
   const {
     register,
@@ -64,16 +64,16 @@ function LoginForm() {
     setIsSubmitting(false);
 
     if (result?.error) {
-      if (result.error === "EMAIL_NOT_VERIFIED") {
+      if (result.code === "EMAIL_NOT_VERIFIED") {
         toast.error("Please verify your email first.");
         router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
         return;
       }
-      if (result.error === "ACCOUNT_BLOCKED") {
+      if (result.code === "ACCOUNT_BLOCKED") {
         toast.error("Your account has been blocked. Contact support.");
         return;
       }
-      if (result.error === "TEACHER_PENDING_APPROVAL") {
+      if (result.code === "TEACHER_PENDING_APPROVAL") {
         toast.error("Your teacher account is pending admin approval.");
         return;
       }
@@ -95,8 +95,8 @@ function LoginForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-2">
-              {(["student", "teacher"] as const).map((r) => (
+            <div className="grid grid-cols-3 gap-2">
+              {(["student", "teacher", "admin"] as const).map((r) => (
                 <button
                   key={r}
                   type="button"

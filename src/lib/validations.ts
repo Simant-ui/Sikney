@@ -16,6 +16,8 @@ export const signupSchema = z
     password: passwordSchema,
     confirmPassword: z.string(),
     role: z.enum(["student", "teacher"]),
+    subjects: z.array(z.string()).optional(),
+    avatarUrl: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -133,6 +135,7 @@ export const createLiveClassSchema = z.object({
   joinUrl: z.string().url("Enter a valid meeting URL"),
   scheduledAt: z.string().min(1, "Schedule date/time is required"),
   durationMinutes: z.number().min(5, "Duration must be at least 5 minutes"),
+  studentIds: z.array(z.string()).optional(),
 });
 
 export type CreateLiveClassInput = z.infer<typeof createLiveClassSchema>;
@@ -150,6 +153,15 @@ export const createVideoSchema = z.object({
   courseId: z.string().min(1, "Select a course"),
   title: z.string().min(2, "Title is required").max(150),
   url: z.string().min(1, "Upload a video"),
+  studentIds: z.array(z.string()).optional(),
 });
 
 export type CreateVideoInput = z.infer<typeof createVideoSchema>;
+
+export const sendMessageSchema = z.object({
+  receiverId: z.string().min(1, "Recipient is required"),
+  content: z.string().min(1, "Message cannot be empty").max(4000),
+  courseId: z.string().optional(),
+});
+
+export type SendMessageInput = z.infer<typeof sendMessageSchema>;

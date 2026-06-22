@@ -6,6 +6,7 @@ export interface IVideo extends Document {
   url: string;
   thumbnailUrl?: string;
   durationSeconds?: number;
+  studentIds: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +18,7 @@ const VideoSchema = new Schema<IVideo>(
     url: { type: String, required: true },
     thumbnailUrl: { type: String },
     durationSeconds: { type: Number },
+    studentIds: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

@@ -3,7 +3,11 @@ import { connectDB } from "@/lib/db";
 import { requireRole } from "@/lib/api-auth";
 import { Course } from "@/models/Course";
 import { Video } from "@/models/Video";
+import { Enrollment } from "@/models/Enrollment";
+import { Notification } from "@/models/Notification";
+import { User } from "@/models/User";
 import { createVideoSchema } from "@/lib/validations";
+import { sendNewRecordingEmail } from "@/lib/email";
 
 export async function GET() {
   const { session, response } = await requireRole("teacher");
@@ -45,6 +49,37 @@ export async function POST(request: Request) {
   }
 
   const video = await Video.create(parsed.data);
+
+  let recipientIds = parsed.data.studentIds ?? [];
+  if (recipientIds.length === 0) {
+    const enrollments = await Enrollment.find({ courseId: course._id, status: "active" }).lean();
+    recipientIds = enrollments.map((e) => String(e.studentId));
+  }
+
+  if (recipientIds.length > 0) {
+    await Notification.insertMany(
+      recipientIds.map((studentId) => ({
+        userId: studentId,
+        title: "New recorded class shared",
+        body: `"${video.title}" was added to ${course.title}`,
+        link: "/student/recorded-classes",
+        type: "class",
+      }))
+    );
+
+    const teacher = await User.findById(session!.user.id).select("fullName").lean();
+    const students = await User.find({ _id: { $in: recipientIds } }).select("email").lean();
+    await Promise.all(
+      students.map((s) =>
+        sendNewRecordingEmail({
+          to: s.email,
+          teacherName: teacher?.fullName ?? "Your teacher",
+          courseTitle: course.title,
+          videoTitle: video.title,
+        }).catch(() => {})
+      )
+    );
+  }
 
   return NextResponse.json(video, { status: 201 });
 }
