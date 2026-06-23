@@ -77,7 +77,10 @@ export function Topbar({ items, role, user }: TopbarProps) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => signOut({ callbackUrl: "/login" })}>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => signOut({ callbackUrl: `${window.location.origin}/login` })}
+            >
               <LogOut className="size-4" /> Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
